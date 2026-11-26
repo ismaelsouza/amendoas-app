@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; form-action 'none'; base-uri 'none'">
+    <title>Casa das Amêndoas · App do vendedor</title>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="js/mobile-ui.js" type="module"></script>
+  </head>
+  <body>
+    <header>
+      <p>Casa das Amêndoas · Vendas</p>
+      <h1>Pedidos de campo</h1>
+      <p id="estado" role="status">Abrindo pedidos…</p>
+    </header>
+    <main>
+      <section aria-label="Demonstração">
+        <h2>Modo demonstração</h2>
+        <p>Clientes, preços e confirmações são fictícios. Nenhum pedido é enviado ao administrativo.</p>
+        <label class="opcao"><input type="checkbox" id="offline"> Simular sem conexão</label>
+        <label class="opcao"><input type="checkbox" id="perder"> Simular perda da próxima resposta</label>
+        <button id="sincronizar" type="button" class="secundario">Sincronizar agora</button>
+      </section>
+      <p id="aviso" role="status"></p>
+      <p id="erro" role="alert"></p>
+      <button id="novo" type="button">Novo rascunho</button>
+      <form id="rascunho" hidden autocomplete="off">
+        <h2>Rascunho</h2>
+        <p>As alterações são salvas automaticamente no aparelho.</p>
+        <label>Cliente cadastrado
+          <select id="cliente"><option value="">Selecione um cliente</option></select>
+        </label>
+        <label hidden>Nome do supermercado
+          <input id="nome-avulso" maxlength="120">
+        </label>
+        <div id="apresentacoes"></div>
+        <p><strong>Total:</strong> <output id="total"></output></p>
+        <div class="acoes">
+          <button id="enviar" type="submit" disabled>Enviar pedido</button>
+          <button id="fechar" type="button" class="secundario">Fechar rascunho</button>
+        </div>
+      </form>
+      <section aria-labelledby="meus-pedidos">
+        <h2 id="meus-pedidos">Meus pedidos</h2>
+        <div id="pedidos">Carregando…</div>
+      </section>
+    </main>
+  </body>
+</html>

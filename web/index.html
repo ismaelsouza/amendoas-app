@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; img-src 'self'; form-action 'none'; base-uri 'none'">
+    <meta name="theme-color" content="#215940">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Casa das Amêndoas · Pedidos de campo</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icone-192.png">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="acompanhamento.js" type="module"></script>
+  </head>
+  <body>
+    <div id="aviso-ambiente" class="aviso-ambiente" role="note" hidden></div>
+    <header><p>Casa das Amêndoas · Vendas</p><h1>Pedidos de campo</h1></header>
+    <main>
+      <form id="entrar">
+        <h2>Entrar como vendedor</h2>
+        <p>Monte pedidos, acompanhe as entregas e retome vendas salvas.</p>
+        <label>Login <input id="login" autocomplete="username" autocapitalize="none" required maxlength="60"></label>
+        <label>Senha <input id="senha" type="password" autocomplete="current-password" required maxlength="128"></label>
+        <label class="opcao"><input type="checkbox" id="permitir-offline"> Permitir acesso offline neste aparelho</label>
+        <p><small>Ative só no seu aparelho. Quem tiver acesso a ele poderá abrir os pedidos salvos sem senha. Para enviar, é preciso entrar na conta.</small></p>
+        <button id="botao-entrar" type="submit">Entrar</button>
+      </form>
+      <button id="abrir-offline" class="secundario" type="button" hidden>Abrir pedidos no aparelho</button>
+      <button id="fechar-offline" class="secundario" type="button" hidden>Fechar pedidos no aparelho</button>
+      <p id="aviso-offline" role="status"></p>
+      <p id="erro" role="alert"></p>
+      <section id="painel-rascunhos" hidden aria-label="Rascunhos de venda"></section>
+      <section id="painel" hidden aria-labelledby="vendedor">
+        <h2 id="vendedor"></h2>
+        <div class="acoes">
+          <button id="atualizar" type="button" class="secundario">Atualizar pedidos</button>
+          <button id="sair" type="button" class="secundario">Sair</button>
+        </div>
+        <p id="status" role="status"></p>
+        <div id="lista-vendas"></div>
+        <button id="mais" type="button" hidden>Carregar pedidos anteriores</button>
+      </section>
+    </main>
+  </body>
+</html>

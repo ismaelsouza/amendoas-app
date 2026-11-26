@@ -1,0 +1,128 @@
+name: CI/CD · App do Vendedor (PWA)
+
+on:
+  push:
+    branches:
+      - develop
+      - release
+      - main
+      - 'feature/**'
+  pull_request:
+    branches:
+      - develop
+      - release
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/feature/') || github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    name: Build e testes da PWA
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:web
+      - run: npm test
+      - name: Publicar artefato da PWA
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-dist
+          path: dist/acompanhamento-web/
+          retention-days: 30
+
+  deploy-dsv:
+    name: Implantar PWA em DSV
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && vars.DEPLOY_DEVELOPMENT == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: https://app-amendoas-dsv.homologacao-app.com.br/app-amendoas/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pwa-dist
+          path: pwa-dist
+      - name: Enviar PWA para a VPS (DSV)
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST_KEY: ${{ secrets.VPS_HOST_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$VPS_HOST_KEY" > ~/.ssh/known_hosts
+          SSH_OPTS="ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes"
+          rsync -az --delete -e "$SSH_OPTS" pwa-dist/ "${VPS_USER}@${VPS_HOST}:/var/www/amendoas-deploy-staging/dsv/"
+          $SSH_OPTS "${VPS_USER}@${VPS_HOST}" "sudo /usr/local/sbin/amendoas-deploy-pwa dsv"
+
+  deploy-hml:
+    name: Implantar PWA em Homologação (HML)
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release' && vars.DEPLOY_HOMOLOGATION == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: homologation
+      url: https://app-amendoas-hml.homologacao-app.com.br/app-amendoas/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pwa-dist
+          path: pwa-dist
+      - name: Enviar PWA para a VPS (HML)
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST_KEY: ${{ secrets.VPS_HOST_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$VPS_HOST_KEY" > ~/.ssh/known_hosts
+          SSH_OPTS="ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes"
+          rsync -az --delete -e "$SSH_OPTS" pwa-dist/ "${VPS_USER}@${VPS_HOST}:/var/www/amendoas-deploy-staging/hml/"
+          $SSH_OPTS "${VPS_USER}@${VPS_HOST}" "sudo /usr/local/sbin/amendoas-deploy-pwa hml"
+
+  deploy-prd:
+    name: Implantar PWA em Produção
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_PRODUCTION == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pwa-dist
+          path: pwa-dist
+      - name: Enviar PWA para a VPS de Produção (quando provisionada)
+        env:
+          PRD_VPS_HOST: ${{ secrets.PRD_VPS_HOST }}
+          PRD_VPS_USER: ${{ secrets.PRD_VPS_USER }}
+          PRD_VPS_SSH_KEY: ${{ secrets.PRD_VPS_SSH_KEY }}
+          PRD_VPS_HOST_KEY: ${{ secrets.PRD_VPS_HOST_KEY }}
+        run: |
+          if [ -z "$PRD_VPS_HOST" ]; then
+            echo "Servidor de produção ainda não provisionado (secret PRD_VPS_HOST ausente). Artefato pwa-dist validado e disponível no workflow."
+            exit 0
+          fi
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$PRD_VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$PRD_VPS_HOST_KEY" > ~/.ssh/known_hosts
+          SSH_OPTS="ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes"
+          rsync -az --delete -e "$SSH_OPTS" pwa-dist/ "${PRD_VPS_USER}@${PRD_VPS_HOST}:/var/www/amendoas-deploy-staging/prd/"
+          $SSH_OPTS "${PRD_VPS_USER}@${PRD_VPS_HOST}" "sudo /usr/local/sbin/amendoas-deploy-pwa prd"
