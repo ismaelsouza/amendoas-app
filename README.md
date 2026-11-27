@@ -1,5 +1,7 @@
 # Casa das Amêndoas · App do vendedor
 
+O [painel e a API compartilhada](https://github.com/ismaelsouza/amendoas-adm) ficam em outro repositório. As [discussões anteriores](https://github.com/prpaulocesarneves-crypto/amendoas-app/issues) continuam no repositório de origem.
+
 O primeiro módulo da APP #3 confere as quantidades, aplica o preço negociado ou o preço padrão, calcula subtotais em centavos e identifica alterações de preço no rascunho. Os testes usam três pacotes e uma venda de 0,750 kg a R$ 29,88/kg.
 
 Com Node.js 24, execute `npm ci`, `npm run build` e `npm test`.
