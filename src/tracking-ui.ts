@@ -25,6 +25,7 @@ const atualizar = porId('atualizar', HTMLButtonElement);
 const sair = porId('sair', HTMLButtonElement);
 const status = porId('status', HTMLElement);
 const erro = porId('erro', HTMLElement);
+const estadoConexao = document.getElementById('estado-conexao');
 const base = location.origin + '/api-amendoas-adm';
 const api = criarAcompanhamento(base);
 const instalacaoSegura = location.protocol === 'https:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost';
@@ -34,6 +35,15 @@ if (avisoAmbiente instanceof HTMLElement && /(?:^|\.)[^.]*-dsv\./i.test(location
   avisoAmbiente.hidden = false;
   document.title = `[DSV] ${document.title}`;
 }
+
+function mostrarConexao() {
+  if (estadoConexao) estadoConexao.textContent = navigator.onLine ? '' : 'Sem conexão. Use os pedidos salvos neste aparelho.';
+}
+
+window.addEventListener('online', mostrarConexao);
+window.addEventListener('offline', mostrarConexao);
+mostrarConexao();
+
 const hora = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Belem' });
 const situacoes: Record<Acompanhamento['situacao'], string> = {
   aguardando_despacho: 'Aguardando despacho', em_entrega: 'Em entrega', entrega_parcial: 'Entrega parcial',
@@ -93,20 +103,32 @@ function abrirRascunhos(usuario: Vendedor['usuario'], token: string | null) {
   }
 }
 
-function qtd(valor: string, unidade: string): string { return `${valor.replace('.', ',')} ${unidade}`; }
+function qtd(valor: string, unidade: Acompanhamento['itens'][number]['unidade']): string {
+  const sufixo = unidade !== 'kg' && Number(valor) !== 1 ? 's' : '';
+  return `${valor.replace('.', ',')} ${unidade}${sufixo}`;
+}
 
 function renderEntregas(d: Acompanhamento): DocumentFragment {
   const resultado = document.createDocumentFragment();
-  resultado.append(texto('h4', situacoes[d.situacao]));
-  const itens = document.createElement('ul');
+  const situacao = texto('h4', situacoes[d.situacao]);
+  situacao.className = 'situacao-entrega';
+  resultado.append(situacao);
   for (const item of d.itens) {
-    const u = item.unidade;
-    itens.append(texto('li', `${item.apresentacao}. Pedido: ${qtd(item.pedida, u)}. Despachado: ${qtd(item.despachada, u)}. `
-      + `Recebido: ${qtd(item.recebida, u)}. Recusado: ${qtd(item.recusada, u)}.`
-      + (Number(item.cancelada) > 0 ? ` Cancelado: ${qtd(item.cancelada, u)}.` : '')
-      + ` A receber: ${qtd(item.pendenteRecebimento, u)}.`));
+    const medidas: [string, string][] = [
+      ['Pedido', item.pedida], ['Despachado', item.despachada], ['Recebido', item.recebida],
+      ['Em trânsito', item.emTransito], ['Recusado', item.recusada],
+      ['A despachar', item.pendenteDespacho], ['A receber', item.pendenteRecebimento],
+    ];
+    if (Number(item.cancelada) > 0) medidas.push(['Cancelado', item.cancelada]);
+    const resumo = document.createElement('dl');
+    resumo.className = 'quantidades-entrega';
+    for (const [rotulo, valor] of medidas) {
+      const par = document.createElement('div');
+      par.append(texto('dt', rotulo), texto('dd', qtd(valor, item.unidade)));
+      resumo.append(par);
+    }
+    resultado.append(texto('h5', item.apresentacao), resumo);
   }
-  resultado.append(itens);
   for (const remessa of d.remessas) {
     const bloco = document.createElement('section');
     const registro = remessa.recebimento;
@@ -115,8 +137,8 @@ function renderEntregas(d: Acompanhamento): DocumentFragment {
     const linhas = document.createElement('ul');
     for (const item of remessa.itens) {
       const rec = registro?.itens.find(({ apresentacaoId }) => apresentacaoId === item.apresentacaoId);
-      linhas.append(texto('li', `${item.apresentacao}: ${qtd(item.despachada, item.unidade)} despachado(s)`
-        + (rec ? `, ${qtd(rec.recebida, item.unidade)} recebido(s), ${qtd(rec.recusada, item.unidade)} recusado(s).` : '.')));
+      linhas.append(texto('li', `${item.apresentacao}. Despachado: ${qtd(item.despachada, item.unidade)}.`
+        + (rec ? ` Recebido: ${qtd(rec.recebida, item.unidade)}. Recusado: ${qtd(rec.recusada, item.unidade)}.` : '')));
     }
     bloco.append(linhas);
     resultado.append(bloco);
@@ -126,8 +148,10 @@ function renderEntregas(d: Acompanhamento): DocumentFragment {
 
 function vendaCard(pedido: PaginaVendas['pedidos'][number]) {
   const card = document.createElement('article');
+  card.className = 'pedido-confirmado';
   const btn = texto('button', 'Ver entregas');
   btn.type = 'button';
+  btn.className = 'secundario';
   const detalhes = document.createElement('div');
   detalhes.setAttribute('aria-live', 'polite');
   btn.addEventListener('click', async () => {
@@ -173,10 +197,12 @@ form.addEventListener('submit', async (evento) => {
   evento.preventDefault();
   if (!instalacaoSegura || entrar.disabled) return;
   entrar.disabled = true;
+  entrar.textContent = 'Entrando…';
   erro.textContent = '';
   const r = await api.entrar(login.value.trim(), senha.value);
   senha.value = '';
   entrar.disabled = false;
+  entrar.textContent = 'Entrar';
   if (!r.success) { falha(r.error); return; }
   sessao = r.data;
   nome.textContent = r.data.usuario.nome;

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; img-src 'self'; form-action 'none'; base-uri 'none'">
-    <meta name="theme-color" content="#215940">
+    <meta name="theme-color" content="#193c30">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Casa das Amêndoas · Pedidos de campo</title>
     <link rel="manifest" href="manifest.webmanifest">
@@ -14,32 +14,50 @@
   </head>
   <body>
     <div id="aviso-ambiente" class="aviso-ambiente" role="note" hidden></div>
-    <header><p>Casa das Amêndoas · Vendas</p><h1>Pedidos de campo</h1></header>
+    <header class="cabecalho-campo">
+      <div class="cabecalho-conteudo">
+        <svg class="amendoa" viewBox="0 0 80 80" aria-hidden="true" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 68C10 40 30 15 70 10C68 44 47 68 10 68Z"/>
+          <path d="M10 68C30 52 50 34 70 10M17 56C26 35 41 24 62 16M23 65C45 58 59 43 65 24M28 49C35 36 45 28 55 24M32 57C44 52 54 42 59 33"/>
+        </svg>
+        <p>Casa das Amêndoas</p>
+        <h1>Pedidos de campo</h1>
+      </div>
+    </header>
     <main>
-      <form id="entrar">
-        <h2>Entrar como vendedor</h2>
-        <p>Monte pedidos, acompanhe as entregas e retome vendas salvas.</p>
-        <label>Login <input id="login" autocomplete="username" autocapitalize="none" required maxlength="60"></label>
-        <label>Senha <input id="senha" type="password" autocomplete="current-password" required maxlength="128"></label>
-        <label class="opcao"><input type="checkbox" id="permitir-offline"> Permitir acesso offline neste aparelho</label>
-        <p><small>Ative só no seu aparelho. Quem tiver acesso a ele poderá abrir os pedidos salvos sem senha. Para enviar, é preciso entrar na conta.</small></p>
-        <button id="botao-entrar" type="submit">Entrar</button>
-      </form>
+      <p id="estado-conexao" class="aviso-rede" role="status"></p>
+      <p id="aviso-offline" class="aviso-rede" role="status"></p>
+      <p id="erro" role="alert"></p>
       <button id="abrir-offline" class="secundario" type="button" hidden>Abrir pedidos no aparelho</button>
       <button id="fechar-offline" class="secundario" type="button" hidden>Fechar pedidos no aparelho</button>
-      <p id="aviso-offline" role="status"></p>
-      <p id="erro" role="alert"></p>
-      <section id="painel-rascunhos" hidden aria-label="Rascunhos de venda"></section>
-      <section id="painel" hidden aria-labelledby="vendedor">
-        <h2 id="vendedor"></h2>
-        <div class="acoes">
-          <button id="atualizar" type="button" class="secundario">Atualizar pedidos</button>
-          <button id="sair" type="button" class="secundario">Sair</button>
+      <section id="painel-rascunhos" hidden aria-labelledby="titulo-rascunhos"></section>
+      <section id="painel" hidden aria-labelledby="titulo-pedidos">
+        <div class="cabecalho-painel">
+          <div>
+            <h2 id="titulo-pedidos">Meus pedidos</h2>
+            <p id="vendedor"></p>
+          </div>
+          <div class="acoes">
+            <button id="atualizar" type="button" class="secundario">Atualizar pedidos</button>
+            <button id="sair" type="button" class="secundario">Sair</button>
+          </div>
         </div>
         <p id="status" role="status"></p>
         <div id="lista-vendas"></div>
         <button id="mais" type="button" hidden>Carregar pedidos anteriores</button>
       </section>
+      <form id="entrar">
+        <h2>Entrar como vendedor</h2>
+        <p>Registre suas vendas e acompanhe as entregas.</p>
+        <label>Login <input id="login" autocomplete="username" autocapitalize="none" required maxlength="60"></label>
+        <label>Senha <input id="senha" type="password" autocomplete="current-password" required maxlength="128"></label>
+        <div class="preferencia-offline">
+          <label class="opcao"><input type="checkbox" id="permitir-offline" aria-describedby="ajuda-offline"> Permitir acesso offline neste aparelho</label>
+          <p id="ajuda-offline"><small>Ative só no seu aparelho. Quem tiver acesso a ele poderá abrir os pedidos salvos sem senha. Para enviar, é preciso entrar na conta.</small></p>
+        </div>
+        <button id="botao-entrar" type="submit">Entrar</button>
+      </form>
     </main>
   </body>
 </html>
