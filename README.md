@@ -1,6 +1,6 @@
 # Casa das Amêndoas · App do vendedor
 
-O [painel e a API compartilhada](https://github.com/ismaelsouza/amendoas-adm) ficam em outro repositório. As [discussões anteriores](https://github.com/prpaulocesarneves-crypto/amendoas-app/issues) continuam no repositório de origem.
+O [painel e a API compartilhada](https://github.com/ismaelsouza/amendoas-adm) ficam em outro repositório. Acompanhe o [aceite da primeira miniversão](https://github.com/ismaelsouza/amendoas-app/issues/1) e as [Issues do App](https://github.com/ismaelsouza/amendoas-app/issues).
 
 O primeiro módulo da APP #3 confere as quantidades, aplica o preço negociado ou o preço padrão, calcula subtotais em centavos e identifica alterações de preço no rascunho. Os testes usam três pacotes e uma venda de 0,750 kg a R$ 29,88/kg.
 
@@ -44,7 +44,7 @@ Para testar em Android físico, instale o APK e entre com um vendedor de teste. 
 
 [Abrir ou instalar a PWA de homologação](https://homologacao-app.com.br/app-amendoas/).
 
-`npm run build:web` gera a PWA em `dist/acompanhamento-web/`. Ela usa a mesma origem para o app e a base de API `/api-amendoas-adm`. A PWA autentica o vendedor na API real e não grava a senha nem o token. O [fluxo de publicação](https://github.com/prpaulocesarneves-crypto/amendoas--adm/issues/11) está no repositório do ADM.
+`npm run build:web` gera a PWA em `dist/acompanhamento-web/`. Ela usa a mesma origem para o app e a base de API `/api-amendoas-adm`. A PWA autentica o vendedor na API real e não grava a senha nem o token. O [fluxo de publicação](https://github.com/ismaelsouza/amendoas-adm/issues/11) está no repositório do ADM.
 
 - **APP #2:** salve e retome rascunhos, consulte pedidos aguardando confirmação e sincronize sem duplicar a venda. O app tenta novamente quando a rede volta ou quando o vendedor entra após reabrir.
 - **APP #3:** busque um supermercado por nome ou CNPJ ao registrar o pedido na PWA ou no APK integrado. A lista mostra sugestões enquanto você digita. Se houver um rascunho compatível aberto, selecionar o cliente preserva as quantidades. A consulta pelo CNPJ completo continua disponível para verificar um cadastro novo.

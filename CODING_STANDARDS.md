@@ -1,0 +1,8 @@
+- tautological tests considered harmful
+- no change-detector tests
+- tests must prove they can fail
+- never test the mock
+- never weaken tests to make them pass
+- no regression tests without behavioral value, except on security fixes
+- preserve behavioral contracts during refactoring
+- review the blast radius, not just the diff
