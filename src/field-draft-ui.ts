@@ -40,14 +40,17 @@ export function iniciarRascunhos(
   const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   const datas = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Belem' });
   const estado = document.createElement('p');
+  estado.className = 'mensagem';
   estado.setAttribute('role', 'status');
   const area = document.createElement('div');
+  area.className = 'editor-rascunho';
   const novo = document.createElement('button');
   novo.type = 'button';
   novo.className = 'secundario';
   novo.textContent = 'Novo rascunho sem cadastro';
   novo.hidden = !geral?.apresentacoes.length;
   const statusFila = document.createElement('p');
+  statusFila.className = 'mensagem';
   statusFila.setAttribute('role', 'status');
   const fila = document.createElement('div');
   const tentar = document.createElement('button');
@@ -55,6 +58,7 @@ export function iniciarRascunhos(
   tentar.textContent = 'Tentar sincronizar';
   tentar.hidden = true;
   const consulta = document.createElement('form');
+  consulta.className = 'consulta-cnpj';
   const label = document.createElement('label');
   label.textContent = 'CNPJ';
   const cnpj = document.createElement('input');
@@ -66,8 +70,9 @@ export function iniciarRascunhos(
   const buscar = document.createElement('button');
   buscar.textContent = 'Consultar CNPJ';
   consulta.hidden = !token;
-  const titulo = document.createElement('h3');
-  titulo.textContent = 'Rascunho de venda';
+  const titulo = document.createElement('h2');
+  titulo.id = 'titulo-rascunhos';
+  titulo.textContent = 'Rascunhos de venda';
   const explicacao = document.createElement('p');
   explicacao.textContent = token
     ? 'Busque um cliente para abrir uma venda ou retome um pedido salvo neste aparelho.'
@@ -120,6 +125,7 @@ export function iniciarRascunhos(
       const card = document.createElement('article');
       const nome = document.createElement('h4');
       if (p.estado === 'rascunho') {
+        card.className = 'pedido-local';
         nome.textContent = p.cliente.nome || 'Cliente não informado';
         const data = document.createElement('p');
         data.textContent = `Rascunho · ${datas.format(new Date(p.atualizadoEm))}`;
@@ -132,6 +138,7 @@ export function iniciarRascunhos(
         return card;
       }
       nome.textContent = p.clienteNome;
+      card.className = p.estado === 'aguardando_confirmacao' ? 'pedido-local aguardando' : 'pedido-local';
       const situacao = document.createElement('p');
       situacao.textContent = p.estado === 'confirmado' ? `Pedido nº ${p.numero}` : 'Aguardando confirmação';
       const itens = document.createElement('ul');
@@ -191,6 +198,7 @@ export function iniciarRascunhos(
     const outros = itensSalvos.filter((item) => !conhecidos.has(item.apresentacaoId));
     const controles = new Map<number, { campo: HTMLInputElement; subtotal: HTMLElement; mudanca: HTMLElement }>();
     const produtos = document.createElement('fieldset');
+    produtos.className = 'itens-rascunho';
     const titulo = document.createElement('legend');
     titulo.textContent = vinculado ? `Rascunho de ${catalogo.cliente.nome}` : 'Rascunho sem cadastro';
     produtos.append(titulo);
@@ -204,6 +212,7 @@ export function iniciarRascunhos(
       produtos.append(rotulo);
     }
     const total = document.createElement('p');
+    total.className = 'total-rascunho';
     const gravacao = document.createElement('p');
     gravacao.setAttribute('role', 'status');
     const enviar = document.createElement('button');

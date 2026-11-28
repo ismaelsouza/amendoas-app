@@ -31,7 +31,7 @@ function icone(tamanho) {
       const w = (dx + dy) / Math.SQRT2;
       const amendoa = (u / 0.28) ** 2 + (w / 0.115) ** 2 <= 1;
       const veio = Math.abs(w - 0.04 * Math.cos(u * 13)) < 0.008 && Math.abs(u) < 0.23;
-      const cor = !amendoa ? [33, 89, 64] : veio ? [146, 91, 51] : [243, 216, 161];
+      const cor = !amendoa ? [25, 60, 48] : veio ? [146, 91, 51] : [236, 197, 139];
       pixels.set(cor, y * larguraLinha + 1 + x * 3);
     }
   }
